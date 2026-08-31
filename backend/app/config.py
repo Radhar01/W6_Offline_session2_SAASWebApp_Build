@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     # Video processing
     FFMPEG_PATH: str = "ffmpeg"
 
+    # B-roll sourcing (optional). Without a key, clips fall back to a
+    # blurred copy of their own footage as the vertical background.
+    PEXELS_API_KEY: str | None = None
+
 
 @lru_cache
 def get_settings() -> Settings:

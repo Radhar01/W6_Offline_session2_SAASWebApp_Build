@@ -108,3 +108,19 @@ def delete_file(path: str | None) -> None:
             logger.info("Deleted file %s", abs_path)
     except OSError:
         logger.warning("Failed to delete file %s", path, exc_info=True)
+
+
+def delete_directory(relative_path: str) -> None:
+    """Recursively remove a directory (e.g. a video's cached B-roll assets).
+
+    Same containment/never-raises contract as `delete_file`: resolves via
+    `get_absolute_path` and silently no-ops on a missing or unsafe path.
+    """
+    try:
+        abs_path = get_absolute_path(relative_path)
+    except ValidationAppError:
+        logger.warning("Refusing to delete directory outside storage root: %s", relative_path)
+        return
+    if abs_path.is_dir():
+        shutil.rmtree(abs_path, ignore_errors=True)
+        logger.info("Deleted directory %s", abs_path)

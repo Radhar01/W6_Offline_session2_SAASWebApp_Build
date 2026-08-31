@@ -110,6 +110,7 @@ async def delete_video(video_id: int, db: Session = Depends(get_db)) -> None:
         storage_service.delete_file(clip.file_path)
 
     storage_service.delete_file(video.file_path)
+    storage_service.delete_directory(f"broll/{video.id}")
 
     db.delete(video)
     db.commit()
