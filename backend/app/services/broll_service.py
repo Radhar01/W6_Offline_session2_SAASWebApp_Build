@@ -11,14 +11,17 @@ from __future__ import annotations
 
 import logging
 import re
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
 import requests
 
 from app.config import settings
+from app.exceptions import ValidationAppError
 from app.models.video import Video
 from app.services.storage_service import get_absolute_path
+from app.services.upload_service import probe_video_duration
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +29,13 @@ _PEXELS_VIDEO_SEARCH_URL = "https://api.pexels.com/videos/search"
 _PEXELS_PHOTO_SEARCH_URL = "https://api.pexels.com/v1/search"
 _SEARCH_TIMEOUT_SECONDS = 10
 _DOWNLOAD_TIMEOUT_SECONDS = 30
+
+# Stock clips often open on a couple of static/establishing seconds before
+# the subject enters frame. Since the clip is looped continuously behind a
+# generated clip's full duration, that dead time would otherwise repeat on
+# every cycle -- so it's trimmed off once, right after download.
+_INTRO_TRIM_SECONDS = 2.0
+_MIN_DURATION_TO_TRIM = _INTRO_TRIM_SECONDS + 3.0
 
 _CACHED_VIDEO_FILENAME = "broll.mp4"
 _CACHED_IMAGE_FILENAME = "broll.jpg"
@@ -119,6 +129,7 @@ def _fetch_video_broll(query: str, abs_dir: Path) -> BrollAsset | None:
             continue
         dest = abs_dir / _CACHED_VIDEO_FILENAME
         if _download(file_url, dest):
+            _trim_intro(dest)
             return BrollAsset(absolute_path=str(dest), is_video=True)
     return None
 
@@ -159,6 +170,47 @@ def _fetch_photo_broll(query: str, abs_dir: Path) -> BrollAsset | None:
     if _download(image_url, dest):
         return BrollAsset(absolute_path=str(dest), is_video=False)
     return None
+
+
+def _trim_intro(path: Path) -> None:
+    """Cut `_INTRO_TRIM_SECONDS` off the start of a downloaded B-roll video, in place.
+
+    Best-effort and silent: skips clips too short to spare the trim, and
+    tolerates ffmpeg/probe failures by leaving the untrimmed file in place.
+    A duller loop beats losing the B-roll entirely, and this must never
+    block clip generation.
+    """
+    try:
+        duration = probe_video_duration(path)
+    except ValidationAppError:
+        return
+    if duration < _MIN_DURATION_TO_TRIM:
+        return
+
+    trimmed_path = path.with_name(path.stem + ".trimmed" + path.suffix)
+    cmd = [
+        settings.FFMPEG_PATH,
+        "-y",
+        "-ss",
+        str(_INTRO_TRIM_SECONDS),
+        "-i",
+        str(path),
+        "-c",
+        "copy",
+        str(trimmed_path),
+    ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, timeout=30, check=False)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        logger.warning("Failed to trim B-roll intro for %s: %s", path, exc)
+        return
+
+    if result.returncode != 0 or not trimmed_path.is_file():
+        trimmed_path.unlink(missing_ok=True)
+        logger.warning("ffmpeg failed trimming B-roll intro for %s", path)
+        return
+
+    trimmed_path.replace(path)
 
 
 def _download(url: str, dest: Path) -> bool:

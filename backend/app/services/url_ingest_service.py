@@ -134,17 +134,16 @@ def _run_ytdlp_download(source_url: str, dest_dir: Path, max_bytes: int) -> dict
         ydl_opts["extractor_args"] = {
             "youtubepot-bgutilhttp": {"base_url": [settings.BGUTIL_PROVIDER_URL]}
         }
-    if settings.YTDLP_COOKIES_PROFILE_PATH:
+    cookies_profile = settings.YTDLP_COOKIES_PROFILE_PATH
+    if cookies_profile and (Path(cookies_profile) / "Cookies").is_file():
         # A PO token alone isn't always enough -- some videos/clients also
         # require real auth cookies. Reads them live from a persistent,
         # already-logged-in Chromium profile rather than a frozen
         # cookies.txt snapshot; see YTDLP_COOKIES_PROFILE_PATH in config.py.
-        ydl_opts["cookiesfrombrowser"] = (
-            "chromium",
-            settings.YTDLP_COOKIES_PROFILE_PATH,
-            None,
-            None,
-        )
+        # The file-existence check keeps this a no-op wherever no one has
+        # ever logged into that profile yet (e.g. local dev) instead of
+        # hard-failing every download attempting to read a missing DB.
+        ydl_opts["cookiesfrombrowser"] = ("chromium", cookies_profile, None, None)
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(source_url, download=True)
     return info or {}

@@ -5,6 +5,7 @@ All Pexels HTTP calls are mocked; nothing here makes a real network request.
 
 from __future__ import annotations
 
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from app.models.video import SourceType, Video, VideoStatus
@@ -147,3 +148,70 @@ def test_get_or_fetch_broll_returns_none_on_request_failure(monkeypatch, tmp_pat
         result = broll_service.get_or_fetch_broll(_make_video())
 
     assert result is None
+
+
+def test_trim_intro_replaces_file_when_long_enough(tmp_path) -> None:
+    video_path = tmp_path / "broll.mp4"
+    video_path.write_bytes(b"original-bytes")
+
+    fake_run = MagicMock(returncode=0)
+
+    def fake_side_effect(cmd, **kwargs):
+        # The real ffmpeg invocation would write the trimmed output file;
+        # simulate that so `_trim_intro` finds it and swaps it in.
+        Path(cmd[-1]).write_bytes(b"trimmed-bytes")
+        return fake_run
+
+    with (
+        patch("app.services.broll_service.probe_video_duration", return_value=10.0),
+        patch("app.services.broll_service.subprocess.run", side_effect=fake_side_effect),
+    ):
+        broll_service._trim_intro(video_path)
+
+    assert video_path.read_bytes() == b"trimmed-bytes"
+
+
+def test_trim_intro_skips_clip_too_short_to_trim(tmp_path) -> None:
+    video_path = tmp_path / "broll.mp4"
+    video_path.write_bytes(b"original-bytes")
+
+    with (
+        patch("app.services.broll_service.probe_video_duration", return_value=3.0),
+        patch("app.services.broll_service.subprocess.run") as mock_run,
+    ):
+        broll_service._trim_intro(video_path)
+
+    mock_run.assert_not_called()
+    assert video_path.read_bytes() == b"original-bytes"
+
+
+def test_trim_intro_leaves_original_when_ffmpeg_fails(tmp_path) -> None:
+    video_path = tmp_path / "broll.mp4"
+    video_path.write_bytes(b"original-bytes")
+
+    with (
+        patch("app.services.broll_service.probe_video_duration", return_value=10.0),
+        patch("app.services.broll_service.subprocess.run", return_value=MagicMock(returncode=1)),
+    ):
+        broll_service._trim_intro(video_path)
+
+    assert video_path.read_bytes() == b"original-bytes"
+
+
+def test_trim_intro_leaves_original_when_duration_probe_fails(tmp_path) -> None:
+    from app.exceptions import ValidationAppError
+
+    video_path = tmp_path / "broll.mp4"
+    video_path.write_bytes(b"original-bytes")
+
+    with (
+        patch(
+            "app.services.broll_service.probe_video_duration",
+            side_effect=ValidationAppError("bad file"),
+        ),
+        patch("app.services.broll_service.subprocess.run") as mock_run,
+    ):
+        broll_service._trim_intro(video_path)
+
+    mock_run.assert_not_called()
+    assert video_path.read_bytes() == b"original-bytes"
