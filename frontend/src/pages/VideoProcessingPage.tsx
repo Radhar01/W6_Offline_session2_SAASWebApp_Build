@@ -79,17 +79,21 @@ export function VideoProcessingPage() {
 
   return (
     <PageWrapper>
-      <h1 className="mb-6 text-2xl font-bold">Processing video</h1>
+      <h1 className="mb-6 text-3xl font-extrabold tracking-tight">Processing video</h1>
 
-      <div className="flex max-w-3xl flex-col gap-6">
+      <div className="mx-auto flex max-w-3xl flex-col gap-6">
         <GlassCard>
           <PipelineStages
             currentStage={video?.status === "completed" ? "generated" : "processing"}
             failed={hasFailed}
-            className="mb-6"
           />
+        </GlassCard>
+
+        <GlassCard className="flex items-center justify-between gap-4">
           <ProgressIndicator status={hasFailed ? "failed" : (video?.status ?? "pending")} />
-          <p className="mt-2 text-sm text-muted-foreground">Video ID: {id ?? "unknown"}</p>
+          <span className="shrink-0 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
+            Video #{id ?? "?"}
+          </span>
         </GlassCard>
 
         {hasFailed && (

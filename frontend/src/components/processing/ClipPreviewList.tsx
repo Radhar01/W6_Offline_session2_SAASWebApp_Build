@@ -23,10 +23,11 @@ export function ClipPreviewList({ clips, className }: ClipPreviewListProps) {
   }
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
+    <div className={cn("flex flex-col gap-4 border-t border-border/60 pt-6", className)}>
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">
-          Generated clips <span className="text-muted-foreground">({clips.length})</span>
+        <h2 className="text-xl font-bold tracking-tight">
+          Generated <span className="text-gradient">clips</span>{" "}
+          <span className="text-muted-foreground">({clips.length})</span>
         </h2>
         <Link to="/library">
           <GradientButton type="button" className="px-4 py-2 text-sm">

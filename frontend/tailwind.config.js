@@ -11,6 +11,19 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: [
+          "'Plus Jakarta Sans'",
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "sans-serif",
+        ],
+      },
+      boxShadow: {
+        glow: "0 8px 40px -8px rgba(139, 92, 246, 0.35)",
+        "glow-lg": "0 20px 60px -12px rgba(139, 92, 246, 0.45)",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

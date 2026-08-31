@@ -1,5 +1,4 @@
 import { Download, Film, Play, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
 
 import { GlassCard } from "@/components/ui/GlassCard";
 import { getDownloadUrl } from "@/services/clipService";
@@ -9,13 +8,14 @@ import type { Clip, ProcessingStatus } from "@/types";
 interface ClipCardProps {
   clip: Clip;
   onDelete: (id: number) => void;
+  onPreview: (clip: Clip) => void;
 }
 
 const STATUS_STYLES: Record<ProcessingStatus, string> = {
-  pending: "bg-muted text-muted-foreground",
-  processing: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
-  completed: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-  failed: "bg-destructive/15 text-destructive",
+  pending: "bg-muted text-muted-foreground ring-1 ring-inset ring-border",
+  processing: "bg-amber-500/15 text-amber-600 ring-1 ring-inset ring-amber-500/20 dark:text-amber-400",
+  completed: "bg-emerald-500/15 text-emerald-600 ring-1 ring-inset ring-emerald-500/20 dark:text-emerald-400",
+  failed: "bg-destructive/15 text-destructive ring-1 ring-inset ring-destructive/20",
 };
 
 /** Format a duration in seconds as `m:ss`. */
@@ -27,14 +27,13 @@ function formatDuration(seconds: number): string {
 }
 
 /** A single clip's card in the library grid: thumbnail, metadata, and actions. */
-export function ClipCard({ clip, onDelete }: ClipCardProps) {
+export function ClipCard({ clip, onDelete, onPreview }: ClipCardProps) {
   const duration = formatDuration(clip.endTime - clip.startTime);
-  const detailPath = `/library/${clip.id}`;
 
   return (
     <GlassCard className="flex flex-col gap-4 p-4">
-      <Link to={detailPath} className="block">
-        <div className="relative aspect-[9/16] w-full overflow-hidden rounded-xl bg-secondary">
+      <button type="button" onClick={() => onPreview(clip)} className="block text-left">
+        <div className="group relative aspect-[9/16] w-full overflow-hidden rounded-xl bg-secondary">
           {clip.thumbnailUrl ? (
             <img
               src={clip.thumbnailUrl}
@@ -46,6 +45,11 @@ export function ClipCard({ clip, onDelete }: ClipCardProps) {
               <Film className="h-8 w-8" aria-hidden="true" />
             </div>
           )}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/30 group-hover:opacity-100">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 shadow-lg">
+              <Play className="h-5 w-5 translate-x-0.5 text-violet-600" aria-hidden="true" />
+            </span>
+          </div>
           <span className="absolute bottom-2 right-2 rounded-full bg-black/70 px-2 py-0.5 text-xs font-medium text-white">
             {duration}
           </span>
@@ -64,16 +68,17 @@ export function ClipCard({ clip, onDelete }: ClipCardProps) {
             {clip.status}
           </span>
         </div>
-      </Link>
+      </button>
 
       <div className="flex items-center gap-2">
-        <Link
-          to={detailPath}
+        <button
+          type="button"
+          onClick={() => onPreview(clip)}
           className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border border-input px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
         >
           <Play className="h-4 w-4" aria-hidden="true" />
           Preview
-        </Link>
+        </button>
         <a
           href={getDownloadUrl(clip.id)}
           download

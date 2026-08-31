@@ -31,7 +31,7 @@ const SORT_OPTIONS: { value: ClipSortOption; label: string }[] = [
 ];
 
 const selectClassName =
-  "rounded-xl border-2 border-input bg-background px-4 py-2 text-sm text-foreground outline-none transition-colors focus:border-ring";
+  "rounded-full border-2 border-input bg-card/70 px-4 py-2 text-sm font-medium text-foreground outline-none backdrop-blur-sm transition-all focus:border-ring focus:shadow-glow";
 
 /** Status filter + sort order controls for the clip library. */
 export function FilterSortBar({ value, onChange }: FilterSortBarProps) {

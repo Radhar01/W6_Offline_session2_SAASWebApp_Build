@@ -4,35 +4,35 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --background: 250 60% 99%;
+    --foreground: 252 30% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 252 30% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover-foreground: 252 30% 12%;
 
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary: 261 60% 96%;
+    --secondary-foreground: 262 60% 30%;
 
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    --muted: 261 40% 96%;
+    --muted-foreground: 252 15% 45%;
 
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    --accent: 262 83% 96%;
+    --accent-foreground: 262 60% 30%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
+    --border: 258 30% 90%;
+    --input: 258 30% 90%;
+    --ring: 262 83% 58%;
 
-    --radius: 0.5rem;
+    --radius: 0.9rem;
   }
 
   .dark {
@@ -72,5 +72,22 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  ::selection {
+    @apply bg-violet-500/20;
+  }
+}
+
+@layer utilities {
+  /* Soft, fixed ambient gradient blobs sitting behind all page content. */
+  .bg-mesh {
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(139, 92, 246, 0.16), transparent 40%),
+      radial-gradient(circle at 88% 15%, rgba(236, 72, 153, 0.14), transparent 38%),
+      radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.12), transparent 45%);
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-violet-600 via-fuchsia-500 to-indigo-500 bg-clip-text text-transparent;
   }
 }

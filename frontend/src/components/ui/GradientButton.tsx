@@ -19,7 +19,7 @@ export function GradientButton({ children, className, disabled, ...props }: Grad
       whileHover={disabled ? undefined : { scale: 1.02, y: -2 }}
       whileTap={disabled ? undefined : { scale: 0.98 }}
       className={cn(
-        "inline-flex items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 font-semibold text-white shadow-md transition-shadow hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 font-semibold text-white shadow-glow transition-shadow duration-300 hover:shadow-glow-lg disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none",
         className,
       )}
       disabled={disabled}

@@ -26,13 +26,13 @@ function makeClip(overrides: Partial<Clip> = {}): Clip {
   };
 }
 
-function renderClipCard(clip: Clip, onDelete = vi.fn()) {
+function renderClipCard(clip: Clip, onDelete = vi.fn(), onPreview = vi.fn()) {
   render(
     <MemoryRouter>
-      <ClipCard clip={clip} onDelete={onDelete} />
+      <ClipCard clip={clip} onDelete={onDelete} onPreview={onPreview} />
     </MemoryRouter>,
   );
-  return { onDelete };
+  return { onDelete, onPreview };
 }
 
 describe("ClipCard", () => {
@@ -62,5 +62,25 @@ describe("ClipCard", () => {
   it("does not call onDelete on render", () => {
     const { onDelete } = renderClipCard(makeClip());
     expect(onDelete).not.toHaveBeenCalled();
+  });
+
+  it("calls onPreview with the clip when the Preview button is clicked", () => {
+    const clip = makeClip({ id: 7 });
+    const { onPreview } = renderClipCard(clip);
+
+    fireEvent.click(screen.getByRole("button", { name: /preview/i }));
+
+    expect(onPreview).toHaveBeenCalledTimes(1);
+    expect(onPreview).toHaveBeenCalledWith(clip);
+  });
+
+  it("calls onPreview with the clip when the thumbnail is clicked", () => {
+    const clip = makeClip({ id: 8, title: "Thumbnail Click Clip" });
+    const { onPreview } = renderClipCard(clip);
+
+    fireEvent.click(screen.getByText("Thumbnail Click Clip"));
+
+    expect(onPreview).toHaveBeenCalledTimes(1);
+    expect(onPreview).toHaveBeenCalledWith(clip);
   });
 });

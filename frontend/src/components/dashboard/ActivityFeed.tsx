@@ -10,10 +10,10 @@ interface ActivityFeedProps {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  completed: "bg-emerald-500/10 text-emerald-600",
-  processing: "bg-amber-500/10 text-amber-600",
-  pending: "bg-slate-500/10 text-slate-600",
-  failed: "bg-red-500/10 text-red-600",
+  completed: "bg-emerald-500/10 text-emerald-600 ring-1 ring-inset ring-emerald-500/20",
+  processing: "bg-amber-500/10 text-amber-600 ring-1 ring-inset ring-amber-500/20",
+  pending: "bg-slate-500/10 text-slate-600 ring-1 ring-inset ring-slate-500/20",
+  failed: "bg-red-500/10 text-red-600 ring-1 ring-inset ring-red-500/20",
 };
 
 /** Format an ISO timestamp as a short relative time string (e.g. "5m ago"). */
@@ -61,8 +61,8 @@ export function ActivityFeed({ items }: ActivityFeedProps) {
 
         return (
           <GlassCard key={item.id} className="flex items-center gap-4 p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-600/10">
-              <Icon className="h-5 w-5 text-violet-600" aria-hidden="true" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-500 shadow-glow">
+              <Icon className="h-5 w-5 text-white" aria-hidden="true" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{item.title}</p>

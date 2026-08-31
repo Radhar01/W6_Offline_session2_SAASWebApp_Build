@@ -61,17 +61,24 @@ export function FileDropzone({ onFileSelected, accept = "video/*", className }: 
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={cn(
-        "flex cursor-pointer flex-col items-center justify-center gap-3 border-2 border-dashed border-input bg-card/40 py-12 text-center transition-colors hover:border-violet-500 hover:bg-card/60",
-        isDragActive && "border-violet-500 bg-violet-500/10",
+        "flex cursor-pointer flex-col items-center justify-center gap-4 border-2 border-dashed border-violet-500/25 bg-card/40 py-14 text-center transition-all duration-300 hover:border-violet-500/60 hover:bg-violet-500/5 hover:shadow-glow",
+        isDragActive && "border-violet-500 bg-violet-500/10 shadow-glow",
         className,
       )}
     >
-      <UploadCloud
-        className={cn("h-10 w-10 text-muted-foreground transition-colors", isDragActive && "text-violet-600")}
-        aria-hidden="true"
-      />
+      <span
+        className={cn(
+          "flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/15 to-fuchsia-500/15 transition-transform duration-300",
+          isDragActive && "scale-110",
+        )}
+      >
+        <UploadCloud
+          className={cn("h-8 w-8 text-violet-600 transition-transform", isDragActive && "-translate-y-0.5")}
+          aria-hidden="true"
+        />
+      </span>
       <div>
-        <p className="font-medium text-foreground">Drag &amp; drop a video here</p>
+        <p className="font-semibold text-foreground">Drag &amp; drop a video here</p>
         <p className="text-sm text-muted-foreground">or click to browse your files</p>
       </div>
       <input

@@ -90,7 +90,7 @@ export function ClipDetailPage() {
   if (isLoading) {
     return (
       <PageWrapper>
-        <h1 className="mb-6 text-2xl font-bold">Clip details</h1>
+        <h1 className="mb-6 text-3xl font-extrabold tracking-tight">Clip details</h1>
         <GlassCard className="flex max-w-xl items-center gap-4">
           <Loader2 className="h-6 w-6 animate-spin text-violet-600" aria-hidden="true" />
           <span className="text-muted-foreground">Loading clip&hellip;</span>
@@ -102,7 +102,7 @@ export function ClipDetailPage() {
   if (error || !clip) {
     return (
       <PageWrapper>
-        <h1 className="mb-6 text-2xl font-bold">Clip details</h1>
+        <h1 className="mb-6 text-3xl font-extrabold tracking-tight">Clip details</h1>
         <GlassCard className="max-w-xl">
           <div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
@@ -115,7 +115,7 @@ export function ClipDetailPage() {
 
   return (
     <PageWrapper>
-      <h1 className="mb-6 text-2xl font-bold">Clip details</h1>
+      <h1 className="mb-6 text-3xl font-extrabold tracking-tight">Clip details</h1>
 
       <GlassCard className="max-w-xl">
         <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-xl bg-black">

@@ -48,7 +48,7 @@ export function DashboardPage() {
   if (isLoading) {
     return (
       <PageWrapper>
-        <h1 className="mb-6 text-2xl font-bold">Dashboard</h1>
+        <h1 className="mb-6 text-3xl font-extrabold tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground">Loading your dashboard...</p>
       </PageWrapper>
     );
@@ -57,7 +57,7 @@ export function DashboardPage() {
   if (error || !stats) {
     return (
       <PageWrapper>
-        <h1 className="mb-6 text-2xl font-bold">Dashboard</h1>
+        <h1 className="mb-6 text-3xl font-extrabold tracking-tight">Dashboard</h1>
         <GlassCard className="text-center text-sm text-destructive">
           {error ?? "Something went wrong."}
         </GlassCard>
@@ -68,9 +68,9 @@ export function DashboardPage() {
   if (stats.totalVideos === 0) {
     return (
       <PageWrapper>
-        <h1 className="mb-6 text-2xl font-bold">Dashboard</h1>
-        <GlassCard className="flex flex-col items-center gap-4 py-12 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-violet-600/10">
+        <h1 className="mb-6 text-3xl font-extrabold tracking-tight">Dashboard</h1>
+        <GlassCard className="flex flex-col items-center gap-4 py-16 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/15 to-fuchsia-500/15">
             <Film className="h-8 w-8 text-violet-600" aria-hidden="true" />
           </div>
           <div>
@@ -89,7 +89,7 @@ export function DashboardPage() {
 
   return (
     <PageWrapper>
-      <h1 className="mb-6 text-2xl font-bold">Dashboard</h1>
+      <h1 className="mb-6 text-3xl font-extrabold tracking-tight">Dashboard</h1>
       <div className="flex flex-col gap-6">
         <StatsWidgetRow stats={stats} />
         <div>

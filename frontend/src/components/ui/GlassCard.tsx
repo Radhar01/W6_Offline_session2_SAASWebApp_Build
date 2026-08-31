@@ -21,7 +21,7 @@ export function GlassCard({ children, className, ...props }: GlassCardProps) {
       whileHover={{ scale: 1.01, y: -4 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        "rounded-2xl border border-border bg-card/60 p-6 text-card-foreground shadow-sm backdrop-blur-lg",
+        "rounded-2xl border border-border/70 bg-card/70 p-6 text-card-foreground shadow-[0_4px_24px_-8px_rgba(124,58,237,0.12)] backdrop-blur-lg transition-shadow duration-300 hover:shadow-glow",
         className,
       )}
       {...props}

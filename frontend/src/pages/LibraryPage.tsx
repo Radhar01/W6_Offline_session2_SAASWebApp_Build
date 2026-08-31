@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { ClipGrid } from "@/components/library/ClipGrid";
+import { ClipPreviewModal } from "@/components/library/ClipPreviewModal";
 import { FilterSortBar, type ClipFilterState } from "@/components/library/FilterSortBar";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -38,6 +39,7 @@ export function LibraryPage() {
   const [filter, setFilter] = useState<ClipFilterState>(DEFAULT_FILTER);
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [previewClip, setPreviewClip] = useState<Clip | null>(null);
 
   const fetchClips = useCallback(async () => {
     setIsLoading(true);
@@ -79,7 +81,9 @@ export function LibraryPage() {
 
   return (
     <PageWrapper>
-      <h1 className="mb-6 text-2xl font-bold">Clip library</h1>
+      <h1 className="mb-6 text-3xl font-extrabold tracking-tight">
+        Clip <span className="text-gradient">library</span>
+      </h1>
 
       <FilterSortBar value={filter} onChange={setFilter} />
 
@@ -96,12 +100,14 @@ export function LibraryPage() {
           <span>Loading clips&hellip;</span>
         </GlassCard>
       ) : clips.length === 0 ? (
-        <GlassCard className="flex flex-col items-center gap-2 py-12 text-center text-muted-foreground">
-          <Film className="h-8 w-8" aria-hidden="true" />
+        <GlassCard className="flex flex-col items-center gap-4 py-16 text-center text-muted-foreground">
+          <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/15 to-fuchsia-500/15">
+            <Film className="h-8 w-8 text-violet-600" aria-hidden="true" />
+          </span>
           <p>No clips yet. Upload a video to get started.</p>
         </GlassCard>
       ) : (
-        <ClipGrid clips={clips} onDelete={setPendingDeleteId} />
+        <ClipGrid clips={clips} onDelete={setPendingDeleteId} onPreview={setPreviewClip} />
       )}
 
       <ConfirmDialog
@@ -117,6 +123,8 @@ export function LibraryPage() {
         onConfirm={() => void handleConfirmDelete()}
         onCancel={() => setPendingDeleteId(null)}
       />
+
+      <ClipPreviewModal clip={previewClip} onClose={() => setPreviewClip(null)} />
     </PageWrapper>
   );
 }

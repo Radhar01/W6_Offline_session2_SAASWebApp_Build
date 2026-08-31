@@ -49,56 +49,60 @@ export function UploadPage() {
 
   return (
     <PageWrapper>
-      <h1 className="mb-6 text-2xl font-bold">Upload a video</h1>
+      <div className="mx-auto max-w-xl">
+        <h1 className="mb-6 text-3xl font-extrabold tracking-tight">
+          Upload a <span className="text-gradient">video</span>
+        </h1>
 
-      {(isUploading || error) && (
-        <GlassCard className="mb-6 max-w-xl">
-          <PipelineStages
-            currentStage={activeTab === "url" ? "downloading" : "upload"}
-            failed={Boolean(error)}
-          />
-        </GlassCard>
-      )}
+        {(isUploading || error) && (
+          <GlassCard className="mb-6">
+            <PipelineStages
+              currentStage={activeTab === "url" ? "downloading" : "upload"}
+              failed={Boolean(error)}
+            />
+          </GlassCard>
+        )}
 
-      <GlassCard className="max-w-xl">
-        <div className="mb-6 flex gap-1 rounded-full bg-secondary p-1">
-          {TABS.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveTab(tab.key)}
-              disabled={isUploading}
-              className={cn(
-                "flex-1 rounded-full px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50",
-                activeTab === tab.key
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
+        <GlassCard>
+          <div className="mb-6 flex gap-1 rounded-full bg-secondary p-1">
+            {TABS.map((tab) => (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
+                disabled={isUploading}
+                className={cn(
+                  "flex-1 rounded-full px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+                  activeTab === tab.key
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {activeTab === "file" ? (
+            <div className="flex flex-col gap-4">
+              <FileDropzone onFileSelected={handleFileSelected} />
+              {selectedFile && (
+                <p className="text-sm text-muted-foreground">Selected: {selectedFile.name}</p>
               )}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+              {isUploading && <UploadProgressBar percent={progress} />}
+            </div>
+          ) : (
+            <UrlIngestForm onSubmit={handleUrlSubmit} isSubmitting={isUploading} />
+          )}
 
-        {activeTab === "file" ? (
-          <div className="flex flex-col gap-4">
-            <FileDropzone onFileSelected={handleFileSelected} />
-            {selectedFile && (
-              <p className="text-sm text-muted-foreground">Selected: {selectedFile.name}</p>
-            )}
-            {isUploading && <UploadProgressBar percent={progress} />}
-          </div>
-        ) : (
-          <UrlIngestForm onSubmit={handleUrlSubmit} isSubmitting={isUploading} />
-        )}
-
-        {error && (
-          <div className="mt-4 flex items-start gap-2 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-            <span>{error}</span>
-          </div>
-        )}
-      </GlassCard>
+          {error && (
+            <div className="mt-4 flex items-start gap-2 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+              <span>{error}</span>
+            </div>
+          )}
+        </GlassCard>
+      </div>
     </PageWrapper>
   );
 }

@@ -32,11 +32,11 @@ export function StatsWidgetRow({ stats }: StatsWidgetRowProps) {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       {tiles.map(({ label, value, icon: Icon }) => (
         <GlassCard key={label} className="flex items-center gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-600/10">
-            <Icon className="h-6 w-6 text-violet-600" aria-hidden="true" />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-500 shadow-glow">
+            <Icon className="h-6 w-6 text-white" aria-hidden="true" />
           </div>
           <div>
-            <p className="text-2xl font-semibold">{value}</p>
+            <p className="text-2xl font-bold tracking-tight">{value}</p>
             <p className="text-sm text-muted-foreground">{label}</p>
           </div>
         </GlassCard>
