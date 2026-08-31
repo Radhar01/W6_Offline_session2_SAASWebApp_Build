@@ -118,11 +118,11 @@ export function ClipDetailPage() {
       <h1 className="mb-6 text-2xl font-bold">Clip details</h1>
 
       <GlassCard className="max-w-xl">
-        <div className="overflow-hidden rounded-xl bg-black">
+        <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-xl bg-black">
           <video
             key={clip.id}
             controls
-            className="aspect-video w-full"
+            className="aspect-[9/16] w-full"
             src={getPreviewUrl(clip.id)}
             poster={clip.thumbnailUrl}
           />

@@ -34,7 +34,7 @@ export function ClipCard({ clip, onDelete }: ClipCardProps) {
   return (
     <GlassCard className="flex flex-col gap-4 p-4">
       <Link to={detailPath} className="block">
-        <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-secondary">
+        <div className="relative aspect-[9/16] w-full overflow-hidden rounded-xl bg-secondary">
           {clip.thumbnailUrl ? (
             <img
               src={clip.thumbnailUrl}

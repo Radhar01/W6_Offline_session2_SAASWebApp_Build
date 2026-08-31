@@ -38,7 +38,7 @@ export function ClipPreviewList({ clips, className }: ClipPreviewListProps) {
       <AnimatedList className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {clips.map((clip) => (
           <GlassCard key={clip.id} className="flex flex-col gap-3 p-4">
-            <div className="flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-secondary">
+            <div className="flex aspect-[9/16] items-center justify-center overflow-hidden rounded-xl bg-secondary">
               {clip.thumbnailUrl ? (
                 <img
                   src={clip.thumbnailUrl}
