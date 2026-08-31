@@ -1,0 +1,38 @@
+"""Application configuration, loaded from environment variables / .env file."""
+
+from functools import lru_cache
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """Central application settings."""
+
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
+
+    # App metadata
+    APP_NAME: str = "ClipCreator"
+    APP_VERSION: str = "0.1.0"
+    FRONTEND_ORIGIN: str = "http://localhost:5173"
+
+    # Database
+    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/clipcreator"
+
+    # Media / file storage
+    MEDIA_STORAGE_PATH: str = "./media"
+    MAX_UPLOAD_SIZE_MB: int = 2048
+
+    # Video processing
+    FFMPEG_PATH: str = "ffmpeg"
+
+
+@lru_cache
+def get_settings() -> Settings:
+    """Return a cached Settings instance (single source of truth app-wide)."""
+    return Settings()
+
+
+# Module-level singleton for convenience (`from app.config import settings`).
+settings = get_settings()

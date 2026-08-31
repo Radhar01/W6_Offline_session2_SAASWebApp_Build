@@ -1,0 +1,1 @@
+"""ClipCreator backend application package."""

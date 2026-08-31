@@ -1,123 +1,258 @@
-# CLAUDE.md - Project Rules
+# CLAUDE.md - ClipCreator Project Rules
 
-> Rules Claude follows in every conversation.
+> Project-specific rules for Claude Code. This file is read automatically.
 
 ---
 
-## Tech Stack
+## Project Overview
 
-- **Backend:** FastAPI + Python 3.11+
-- **Frontend:** React + TypeScript + Vite
-- **Database:** PostgreSQL + SQLAlchemy
-- **Auth:** JWT + Google OAuth
-- **UI:** Chakra UI or Tailwind + Framer Motion
+**Project Name:** ClipCreator
+**Description:** Upload a long-duration or large video (via file upload or URL) and automatically convert it into meaningful, logically-segmented short clips/reels. Target users: YouTube and social media content creators.
+
+**Tech Stack:**
+- Backend: FastAPI + Python 3.11+
+- Frontend: React + Vite + TypeScript
+- Database: PostgreSQL + SQLAlchemy
+- Auth: None (no authentication in MVP — single-tenant/open access)
+- UI: Tailwind + shadcn/ui
+- Payments: None
 
 ---
 
 ## Project Structure
 
 ```
-project/
+clipcreator/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py, config.py, database.py
-│   │   ├── models/, schemas/, routers/, services/, auth/
+│   │   ├── main.py
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   ├── models/
+│   │   │   ├── video.py
+│   │   │   └── clip.py
+│   │   ├── schemas/
+│   │   │   ├── video.py
+│   │   │   └── clip.py
+│   │   ├── routers/
+│   │   │   ├── videos.py
+│   │   │   ├── clips.py
+│   │   │   └── dashboard.py
+│   │   ├── services/
+│   │   │   ├── upload_service.py      # chunked/resumable file upload
+│   │   │   ├── url_ingest_service.py  # video-from-URL fetching
+│   │   │   ├── segmentation_service.py # AI clip generation
+│   │   │   └── storage_service.py     # video/clip file storage
+│   │   └── workers/
+│   │       └── clip_generation_worker.py  # background/async processing job
 │   ├── alembic/
-│   └── tests/
+│   ├── tests/
+│   └── requirements.txt
 ├── frontend/
-│   └── src/
-│       ├── components/, pages/, hooks/, services/, context/, types/
-├── skills/           # 5 skill files
-├── agents/           # Agent definitions
-└── .claude/commands/ # /generate-prp, /execute-prp
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   │   ├── Upload.tsx
+│   │   │   ├── Processing.tsx
+│   │   │   ├── Library.tsx
+│   │   │   ├── ClipDetail.tsx
+│   │   │   └── Dashboard.tsx
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── context/
+│   │   └── types/
+│   └── package.json
+├── .claude/
+│   └── commands/
+├── skills/
+├── agents/
+└── PRPs/
 ```
 
 ---
 
 ## Code Standards
 
-### Python
+### Python (Backend)
 ```python
-# Type hints required
-def get_user(db: Session, user_id: int) -> User:
+# ALWAYS use type hints
+def get_video(db: Session, video_id: int) -> Video:
     pass
 
-# Async endpoints
-@router.get("/users/{id}")
-async def get_user(id: int, db: Session = Depends(get_db)):
+# ALWAYS add docstrings for public functions
+def create_clip(db: Session, data: ClipCreate) -> Clip:
+    """
+    Create a new clip.
+
+    Args:
+        db: Database session
+        data: Clip creation data
+
+    Returns:
+        Created Clip object
+    """
     pass
 ```
 
-### TypeScript
+### TypeScript (Frontend)
 ```typescript
-// Interfaces required - NO any types
-interface User { id: number; email: string; }
+// ALWAYS define interfaces for props and data
+interface ClipProps {
+  id: number;
+  videoId: number;
+  title: string;
+  thumbnailUrl: string;
+  startTime: number;
+  endTime: number;
+  status: "pending" | "processing" | "completed" | "failed";
+}
 
-const fetchUser = async (id: number): Promise<User> => { ... };
+// NO any types allowed
+const fetchClip = async (id: number): Promise<ClipProps> => {
+  // ...
+};
 ```
 
 ---
 
-## Forbidden
+## Forbidden Patterns
 
-- `print()` → use `logging`
-- Plain passwords → use bcrypt
-- Hardcoded secrets → use env vars
-- `any` type in TypeScript
-- `console.log` in production
-- Inline styles → use UI framework
+### Backend
+- Never use `print()` - use `logging` module
+- Never hardcode secrets - use environment variables
+- Never use `SELECT *` - specify columns
+- Never skip input validation (especially file type/size and URL validation on upload endpoints)
+- Never load an entire large video file into memory - stream/chunk file I/O
 
----
-
-## Workflow
-
-```
-1. Edit INITIAL.md (define product)
-2. /generate-prp INITIAL.md
-3. /execute-prp PRPs/[name]-prp.md
-```
+### Frontend
+- Never use `any` type
+- Never leave console.log in production
+- Never skip error handling in async operations (uploads and clip generation are long-running and failure-prone)
+- Never use inline styles - use Tailwind/shadcn
 
 ---
 
-## Skills
+## Module-Specific Rules
 
-| Task | Skill |
-|------|-------|
-| API + Auth | `skills/BACKEND.md` |
-| React + UI | `skills/FRONTEND.md` |
-| Models | `skills/DATABASE.md` |
-| Tests | `skills/TESTING.md` |
-| Docker | `skills/DEPLOYMENT.md` |
+### Video Upload/Import Module
+- All uploads must be validated for file type (video formats only) and size limit before processing starts
+- Large file uploads must use chunked/resumable upload — do not require the full file in a single request
+- URL ingestion must validate the URL scheme/host before fetching
+- `Video.status` must be one of: `pending`, `processing`, `completed`, `failed`
+
+### Clip Generation Module
+- Clip generation must run as a background job (not blocking the request/response cycle)
+- `Clip.status` must be one of: `pending`, `processing`, `completed`, `failed`
+- Deleting a `Video` must cascade-delete its associated `Clip` records and files
+
+### Clip Library Module
+- Clip title/thumbnail updates must not alter the underlying clip video file
+- Clip download endpoint must stream the file, not load it fully into memory
+
+### Dashboard Module
+- Stats must be computed from `Video`/`Clip` tables directly — do not introduce a separate stats/cache model for MVP
 
 ---
 
-## Agents
+## API Conventions
 
-| Agent | Role |
-|-------|------|
-| DATABASE-AGENT | Models + migrations |
-| BACKEND-AGENT | API + auth |
-| FRONTEND-AGENT | UI + pages |
-| DEVOPS-AGENT | Docker + CI/CD |
+- All endpoints prefixed with `/api/v1/`
+- Use plural nouns for resources: `/videos`, `/clips`
+- Return appropriate HTTP status codes:
+  - 200: Success
+  - 201: Created
+  - 400: Bad Request
+  - 404: Not Found
+  - 409: Conflict
+  - 422: Unprocessable Entity (validation errors)
 
 ---
 
-## Validation
+## Authentication
 
-```bash
-ruff check backend/ && pytest
-npm run lint && npm run type-check
-docker-compose build
-```
+No authentication in this MVP — the app is single-tenant/open access. Do not add login/register flows, JWT handling, or protected routes unless the scope changes. If auth is added later, revisit `INITIAL.md` first.
 
 ---
 
 ## Environment Variables
 
 ```env
-DATABASE_URL=postgresql://user:pass@localhost:5432/db
-SECRET_KEY=your-secret-key
-GOOGLE_CLIENT_ID=xxx
-GOOGLE_CLIENT_SECRET=xxx
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/clipcreator
+
+# Storage
+MEDIA_STORAGE_PATH=./storage
+MAX_UPLOAD_SIZE_MB=2048
+
+# Video processing
+FFMPEG_PATH=/usr/bin/ffmpeg
+
+# Frontend
 VITE_API_URL=http://localhost:8000
 ```
+
+---
+
+## Development Commands
+
+```bash
+# Backend
+cd backend
+pip install -r requirements.txt
+alembic upgrade head
+uvicorn app.main:app --reload
+
+# Frontend
+cd frontend
+npm install
+npm run dev
+
+# Docker
+docker-compose up -d
+
+# Tests
+pytest backend/tests -v
+cd frontend && npm test
+
+# Linting
+ruff check backend/
+cd frontend && npm run lint
+```
+
+---
+
+## Commit Message Format
+
+```
+feat([module]): add [feature]
+fix([module]): fix [bug]
+refactor([module]): refactor [component]
+test([module]): add tests for [feature]
+docs: update [documentation]
+```
+
+---
+
+## Skills Reference
+
+| Task | Skill to Read |
+|------|---------------|
+| Database models | skills/DATABASE.md |
+| API + Auth | skills/BACKEND.md |
+| React + UI | skills/FRONTEND.md |
+| Testing | skills/TESTING.md |
+| Deployment | skills/DEPLOYMENT.md |
+
+---
+
+## Agent Coordination
+
+For complex tasks, the ORCHESTRATOR coordinates:
+- DATABASE-AGENT → Backend models (Video, Clip)
+- BACKEND-AGENT → API development (upload, URL ingestion, clip generation, library, dashboard)
+- FRONTEND-AGENT → UI components (upload, processing status, library, dashboard pages)
+- TEST-AGENT → Testing
+- REVIEW-AGENT → Code review
+- DEVOPS-AGENT → Deployment (incl. video processing worker/container)
+
+Read agent definitions in `/agents/` folder.

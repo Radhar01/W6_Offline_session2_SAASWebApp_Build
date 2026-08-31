@@ -1,0 +1,30 @@
+# --- Core framework ---
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# --- Database ---
+sqlalchemy>=2.0.0
+alembic>=1.13.0
+psycopg2-binary>=2.9.9
+
+# --- Validation / settings ---
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# --- File uploads & networking ---
+python-multipart>=0.0.6
+httpx>=0.26.0
+requests>=2.31.0
+
+# --- Video processing ---
+ffmpeg-python>=0.2.0
+yt-dlp>=2024.8.6
+
+# --- Testing ---
+pytest>=8.0.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.23.0
+
+# --- Linting / type-checking ---
+ruff>=0.3.0
+mypy>=1.9.0

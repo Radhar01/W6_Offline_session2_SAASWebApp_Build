@@ -1,0 +1,10 @@
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "SIM", "ASYNC", "PLW", "UP", "PIE"]
+ignore = [
+    "B008",  # FastAPI's `Depends(...)` in argument defaults is the idiomatic DI pattern.
+    "UP042", # str+Enum (not StrEnum) keeps SQLAlchemy's Enum(...) column type happy.
+]
