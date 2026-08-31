@@ -121,6 +121,14 @@ def _run_ytdlp_download(source_url: str, dest_dir: Path, max_bytes: int) -> dict
         "retries": 2,
         "ffmpeg_location": ffmpeg_dir,
     }
+    if settings.BGUTIL_PROVIDER_URL:
+        # Lets YouTube downloads pass its bot/PO-token check from a
+        # datacenter IP. Requires the bgutil-ytdlp-pot-provider sidecar
+        # service (and its pip package) to be running/installed; a no-op
+        # otherwise -- see BGUTIL_PROVIDER_URL's docstring in config.py.
+        ydl_opts["extractor_args"] = {
+            "youtubepot-bgutilhttp": {"base_url": [settings.BGUTIL_PROVIDER_URL]}
+        }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(source_url, download=True)
     return info or {}

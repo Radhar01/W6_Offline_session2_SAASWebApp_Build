@@ -17,6 +17,15 @@ services:
       timeout: 5s
       retries: 5
 
+  # yt-dlp PO-token provider: generates the "proof of origin" token YouTube
+  # requires from datacenter/VPS IPs (avoids the "Sign in to confirm you're
+  # not a bot" block). Internal only -- yt-dlp reaches it over the compose
+  # network. https://github.com/Brainicism/bgutil-ytdlp-pot-provider
+  bgutil-provider:
+    image: brainicism/bgutil-ytdlp-pot-provider:latest
+    restart: unless-stopped
+    init: true
+
   backend:
     build:
       context: ./backend
@@ -27,9 +36,12 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-clipcreator}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-clipcreator}
       MEDIA_STORAGE_PATH: /app/storage
+      BGUTIL_PROVIDER_URL: http://bgutil-provider:4416
     depends_on:
       postgres:
         condition: service_healthy
+      bgutil-provider:
+        condition: service_started
     volumes:
       - ./storage:/app/storage
     ports:

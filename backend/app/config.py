@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     # blurred copy of their own footage as the vertical background.
     PEXELS_API_KEY: str | None = None
 
+    # yt-dlp PO-token provider (optional). Without it, YouTube downloads
+    # from datacenter/VPS IPs are frequently blocked ("Sign in to confirm
+    # you're not a bot"). See services/url_ingest_service.py.
+    BGUTIL_PROVIDER_URL: str | None = None
+
 
 @lru_cache
 def get_settings() -> Settings:
