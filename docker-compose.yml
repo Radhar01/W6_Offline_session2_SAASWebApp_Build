@@ -57,7 +57,8 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-clipcreator}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-clipcreator}
       MEDIA_STORAGE_PATH: /app/storage
       BGUTIL_PROVIDER_URL: http://bgutil-provider:4416
-      YTDLP_COOKIES_PROFILE_PATH: /app/chromium_profile
+      # LinuxServer's chromium image nests the actual profile under .config.
+      YTDLP_COOKIES_PROFILE_PATH: /app/chromium_profile/.config/chromium/Default
     depends_on:
       postgres:
         condition: service_healthy

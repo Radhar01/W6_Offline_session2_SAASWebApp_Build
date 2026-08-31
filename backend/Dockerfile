@@ -24,8 +24,13 @@ WORKDIR /app
 
 # ffmpeg is required at runtime for video transcoding/segmentation.
 # libpq5 is the runtime (non-dev) Postgres client library for psycopg2-binary.
+# deno is yt-dlp's JS runtime for YouTube's player-response signature
+# descrambling -- without it, YouTube extraction is degraded/missing formats.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ffmpeg libpq5 \
+    && apt-get install -y --no-install-recommends ffmpeg libpq5 curl unzip ca-certificates \
+    && curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh \
+    && apt-get purge -y curl unzip \
+    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Bring in compiled Python packages from the builder stage.
