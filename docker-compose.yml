@@ -26,6 +26,26 @@ services:
     restart: unless-stopped
     init: true
 
+  # Persistent headless Chromium (LinuxServer's KasmVNC-based image), logged
+  # into YouTube once via its web-based remote desktop. yt-dlp then reads
+  # cookies live from this profile on every request instead of a frozen
+  # cookies.txt snapshot, so it keeps working as the session naturally
+  # refreshes itself -- exactly like staying logged into Gmail for months.
+  # The web UI is loopback-only; reach it via an SSH tunnel, never expose
+  # it publicly (it holds an authenticated Google session).
+  youtube-cookies:
+    image: lscr.io/linuxserver/chromium:latest
+    restart: unless-stopped
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: Etc/UTC
+    shm_size: "1gb"
+    volumes:
+      - youtube_cookies_profile:/config
+    ports:
+      - "127.0.0.1:3005:3000"
+
   backend:
     build:
       context: ./backend
@@ -37,6 +57,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-clipcreator}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-clipcreator}
       MEDIA_STORAGE_PATH: /app/storage
       BGUTIL_PROVIDER_URL: http://bgutil-provider:4416
+      YTDLP_COOKIES_PROFILE_PATH: /app/chromium_profile
     depends_on:
       postgres:
         condition: service_healthy
@@ -44,6 +65,7 @@ services:
         condition: service_started
     volumes:
       - ./storage:/app/storage
+      - youtube_cookies_profile:/app/chromium_profile:ro
     ports:
       - "8000:8000"
 
@@ -61,3 +83,4 @@ services:
 
 volumes:
   postgres_data:
+  youtube_cookies_profile:

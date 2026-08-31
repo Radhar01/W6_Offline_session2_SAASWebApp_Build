@@ -36,6 +36,12 @@ class Settings(BaseSettings):
     # you're not a bot"). See services/url_ingest_service.py.
     BGUTIL_PROVIDER_URL: str | None = None
 
+    # Path to a persistent Chromium profile directory (optional) that
+    # yt-dlp reads YouTube auth cookies from live on every request. Needed
+    # alongside BGUTIL_PROVIDER_URL when a PO token alone isn't enough to
+    # clear YouTube's bot check from a datacenter IP.
+    YTDLP_COOKIES_PROFILE_PATH: str | None = None
+
 
 @lru_cache
 def get_settings() -> Settings:
