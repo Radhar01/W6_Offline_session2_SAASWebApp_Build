@@ -1,0 +1,23 @@
+# docker-compose.prod.yml
+# Production override: routes through the host's existing Traefik reverse
+# proxy (Let's Encrypt via HTTP-01) instead of binding 80/443 directly.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+services:
+  backend:
+    ports: !override []
+
+  frontend:
+    build:
+      args:
+        VITE_API_URL: ""
+    ports: !override
+      - "127.0.0.1:8080:80"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.clipcreator.rule=Host(`clipcreator.rajeshai.tech`)
+      - traefik.http.routers.clipcreator.entrypoints=websecure
+      - traefik.http.routers.clipcreator.tls.certresolver=letsencrypt
+      - traefik.http.services.clipcreator.loadbalancer.server.port=80
