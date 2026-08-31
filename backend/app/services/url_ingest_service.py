@@ -120,6 +120,11 @@ def _run_ytdlp_download(source_url: str, dest_dir: Path, max_bytes: int) -> dict
         "socket_timeout": 30,
         "retries": 2,
         "ffmpeg_location": ffmpeg_dir,
+        # Lets yt-dlp fetch its JS challenge-solver script for YouTube's
+        # signature/n-parameter descrambling. Without this, `deno` being
+        # installed alone isn't enough -- YouTube returns formats with no
+        # usable URLs and only storyboard (mhtml) formats survive.
+        "remote_components": {"ejs:github"},
     }
     if settings.BGUTIL_PROVIDER_URL:
         # Lets YouTube downloads pass its bot/PO-token check from a
